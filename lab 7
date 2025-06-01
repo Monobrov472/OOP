@@ -1,0 +1,68 @@
+import cv2                        # Для роботи з відео
+import tkinter as tk              # Для створення GUI
+from tkinter import ttk           # Для оформлення елементів GUI
+from PIL import Image, ImageTk    # Для відображення зображення у вікні Tkinter
+
+# === Основна функція для запуску обробки кадрів ===
+def video_loop():
+    ret, frame = cap.read()  # Зчитуємо кадр з веб-камери
+    if ret:
+        # Якщо увімкнено фільтр — застосовуємо медіанну фільтрацію
+        if filter_var.get():
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            filtered = cv2.medianBlur(gray, 5)
+            display_frame = cv2.cvtColor(filtered, cv2.COLOR_GRAY2BGR)
+        else:
+            display_frame = frame
+
+        # Конвертація кадру у формат, що підтримується Tkinter
+        img = cv2.cvtColor(display_frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(img)
+        imgtk = ImageTk.PhotoImage(image=img)
+        video_label.imgtk = imgtk
+        video_label.configure(image=imgtk)
+
+    # Оновлення кадру кожні 10 мс
+    root.after(10, video_loop)
+
+# === Завершення роботи: закриття камери та вікна ===
+def on_close():
+    cap.release()
+    root.destroy()
+
+# === Налаштування головного вікна ===
+root = tk.Tk()
+root.title("Обробка відео з фільтром")
+root.geometry("800x600")
+
+# === Відео-вікно ===
+video_label = tk.Label(root)
+video_label.pack()
+
+# === Перемикач фільтрації ===
+filter_var = tk.BooleanVar()
+filter_checkbox = ttk.Checkbutton(
+    root,
+    text="Увімкнути медіанний фільтр",
+    variable=filter_var
+)
+filter_checkbox.pack(pady=10)
+
+# === Кнопка для завершення ===
+exit_button = ttk.Button(root, text="Вийти", command=on_close)
+exit_button.pack(pady=10)
+
+# === Ініціалізація відеозахоплення ===
+cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    print("Не вдалося відкрити камеру")
+    exit()
+
+# Запускаємо обробку відео
+video_loop()
+
+# Обробка події закриття вікна
+root.protocol("WM_DELETE_WINDOW", on_close)
+
+# Запуск GUI
+root.mainloop()
