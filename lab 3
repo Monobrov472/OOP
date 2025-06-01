@@ -1,0 +1,43 @@
+import cv2  # Імпортуємо бібліотеку OpenCV
+
+# Створюємо об'єкт для захоплення відео з веб-камери
+cap = cv2.VideoCapture(0)  # Індекс 0 означає першу підключену веб-камеру
+
+# Перевірка, чи відкрито камеру успішно
+if not cap.isOpened():
+    print("Не вдалося відкрити веб-камеру.")
+else:
+    print("Захоплення відео. Натисніть 'q' для виходу.")
+    while True:
+        ret, frame = cap.read()  # Зчитуємо кадр з веб-камери
+        if not ret:
+            break  # Вихід, якщо кадр не зчитано
+
+        # === Кольорові перетворення ===
+
+        # 1. Перетворення в відтінки сірого (grayscale)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # 2. Перетворення в HSV (відтінок, насиченість, яскравість)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # 3. Перетворення в LAB (світлість, кольори)
+        lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+
+        # 4. Перетворення в RGB (зміна порядку каналів)
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        # Відображення кадрів з різними перетвореннями
+        cv2.imshow('Оригінал (BGR)', frame)      # Початковий кадр (формат BGR)
+        cv2.imshow('Сірий', gray)                # Кадр у відтінках сірого
+        cv2.imshow('HSV', hsv)                   # Кадр у просторі HSV
+        cv2.imshow('LAB', lab)                   # Кадр у просторі LAB
+        cv2.imshow('RGB', rgb)                   # Кадр у просторі RGB
+
+        # Натисніть 'q' для виходу з циклу
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+# Звільняємо ресурси
+cap.release()              # Звільняємо камеру
+cv2.destroyAllWindows()    # Закриваємо всі вікна
