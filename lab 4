@@ -1,0 +1,48 @@
+import cv2  # Імпортуємо бібліотеку OpenCV
+import numpy as np  # Імпортуємо бібліотеку NumPy для роботи з матрицями
+
+# Створюємо об'єкт для захоплення відео з веб-камери
+cap = cv2.VideoCapture(0)
+
+# Перевірка, чи вдалося відкрити камеру
+if not cap.isOpened():
+    print("Не вдалося відкрити веб-камеру.")
+else:
+    print("Натисніть 'q' для виходу.")
+    while True:
+        ret, frame = cap.read()  # Зчитуємо кадр з відеопотоку
+        if not ret:
+            break
+
+        # === 1. Масштабування (зменшення) ===
+        resized = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_LINEAR)
+        # fx і fy — коефіцієнти масштабування по ширині та висоті
+
+        # === 2. Поворот на 90 градусів навколо центру зображення ===
+        (h, w) = frame.shape[:2]  # Отримуємо розміри зображення
+        center = (w // 2, h // 2)  # Обчислюємо центр зображення
+        matrix = cv2.getRotationMatrix2D(center, 90, 1.0)  # Створюємо матрицю повороту (на 90°)
+        rotated = cv2.warpAffine(frame, matrix, (w, h))  # Застосовуємо поворот
+
+        # === 3. Віддзеркалення (дзеркально по горизонталі) ===
+        flipped = cv2.flip(frame, 1)  # 1 означає горизонтальне віддзеркалення
+
+        # === 4. Зсув зображення (трансляція) ===
+        tx, ty = 50, 30  # Зсув на 50 пікселів вправо і 30 вниз
+        translation_matrix = np.float32([[1, 0, tx], [0, 1, ty]])  # Матриця трансляції
+        translated = cv2.warpAffine(frame, translation_matrix, (w, h))  # Застосування трансляції
+
+        # === Відображення результатів ===
+        cv2.imshow('Оригінал', frame)
+        cv2.imshow('Масштабоване', resized)
+        cv2.imshow('Повернуте', rotated)
+        cv2.imshow('Віддзеркалене', flipped)
+        cv2.imshow('Зсунути', translated)
+
+        # Вихід за натисканням клавіші 'q'
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+# Звільняємо ресурси
+cap.release()
+cv2.destroyAllWindows()
