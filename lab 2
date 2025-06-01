@@ -1,7 +1,7 @@
 import cv2  # Імпортуємо бібліотеку OpenCV
 
 # === 1. Завантаження відео з файлу ===
-video_file = 'video.mp4'  # Вказуємо шлях до відеофайлу
+sources = {'video1': "data/Video/video.mp4", 'video2': "data/Video/video.mp4", "web": 0}
 cap_file = cv2.VideoCapture(video_file)  # Створюємо об'єкт для читання відео з файлу
 
 # Перевірка, чи вдалося відкрити файл
